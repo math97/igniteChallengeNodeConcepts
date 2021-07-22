@@ -64,15 +64,41 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
 });
 
 app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { user } = request;
+  const { id } = request.params;
+  const { title, deadline } = request.body;
+
+  const todo = user.todos.find(t => t.id === id);
+  if(!todo) response.status(404).json({error:'Todo not found'});
+
+  if(title) todo.title = title;
+  if(deadline) todo.deadline = deadline;
+
+  response.json(todo);
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { user } = request;
+  const { id } = request.params;
+
+  const todo = user.todos.find(t => t.id === id);
+  if(!todo) response.status(404).json({error:'Todo not found'});
+
+  todo.done = true;
+
+  response.json(todo);
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { user } = request;
+  const { id } = request.params;
+
+  const todoIndex = user.todos.findIndex(t => t.id === id);
+  if(todoIndex === -1) response.status(404).json({error:'Todo not found'});
+
+  user.todos.splice(todoIndex,1);
+  
+  response.status(204).send();
 });
 
 module.exports = app;
